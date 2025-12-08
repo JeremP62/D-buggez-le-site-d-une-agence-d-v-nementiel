@@ -1,7 +1,8 @@
+// src/components/Select/index.js
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import { useState } from "react";
 import PropTypes from "prop-types";
+import { useState } from "react";
 
 import "./style.scss";
 
@@ -12,14 +13,15 @@ const Select = ({
   titleEmpty,
   label,
   type = "normal",
+  value, // valeur contrôlée
 }) => {
-  const [value, setValue] = useState();
   const [collapsed, setCollapsed] = useState(true);
+
   const changeValue = (newValue) => {
-    onChange();
-    setValue(newValue);
-    setCollapsed(newValue);
+    onChange(newValue);   // transmet la valeur au parent
+    setCollapsed(true);   // ferme le menu après sélection
   };
+
   return (
     <div className={`SelectContainer ${type}`} data-testid="select-testid">
       {label && <div className="label">{label}</div>}
@@ -32,16 +34,22 @@ const Select = ({
             <>
               {!titleEmpty && (
                 <li onClick={() => changeValue(null)}>
-                  <input defaultChecked={!value} name="selected" type="radio" />{" "}
+                  <input
+                    type="radio"
+                    name="selected"
+                    checked={!value}
+                    readOnly
+                  />{" "}
                   Toutes
                 </li>
               )}
               {selection.map((s) => (
                 <li key={s} onClick={() => changeValue(s)}>
                   <input
-                    defaultChecked={value === s}
-                    name="selected"
                     type="radio"
+                    name="selected"
+                    checked={value === s}
+                    readOnly
                   />{" "}
                   {s}
                 </li>
@@ -88,7 +96,8 @@ Select.propTypes = {
   titleEmpty: PropTypes.bool,
   label: PropTypes.string,
   type: PropTypes.string,
-}
+  value: PropTypes.string,
+};
 
 Select.defaultProps = {
   onChange: () => null,
@@ -96,6 +105,7 @@ Select.defaultProps = {
   label: "",
   type: "normal",
   name: "select",
-}
+  value: null,
+};
 
 export default Select;

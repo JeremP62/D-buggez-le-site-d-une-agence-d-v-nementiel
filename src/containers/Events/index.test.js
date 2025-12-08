@@ -39,7 +39,8 @@ const data = {
 
 describe("When Events is created", () => {
   it("a list of event card is displayed", async () => {
-    api.loadData = jest.fn().mockReturnValue(data);
+    api.loadData = jest.fn().mockRejectedValue(new Error("Échec du chargement"));
+
     render(
       <DataProvider>
         <Events />

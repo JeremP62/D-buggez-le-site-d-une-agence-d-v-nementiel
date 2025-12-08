@@ -1,25 +1,31 @@
 import { useEffect, useMemo, useState, useId } from "react";
 import { useData } from "../../contexts/DataContext";
-import { getMonth } from "../../helpers/Date";
+import { parseDate, getMonth } from "../../helpers/Date";
 
 import "./style.scss";
 
 const Slider = () => {
   const { data } = useData();
   const [index, setIndex] = useState(0);
-  const id = useId(); 
+  const id = useId();
 
-  // 🔥 On déplace la 1ère image en 3ème position
+  // 🔹 Tri des slides du plus ancien au plus récent
   const slides = useMemo(() => {
-    const arr = [...(data?.focus ?? [])];
-    if (arr.length >= 3) {
-      const first = arr.shift(); // retire la première
-      arr.splice(2, 0, first);   // l’insère en 3ème position
-    }
+    const arr = [...(data?.focus ?? [])].map((ev) => ({
+      ...ev,
+      dateObj: parseDate(ev.date), // on crée une nouvelle propriété sans modifier ev
+    }));
+
+    arr.sort((a, b) => {
+      if (!a.dateObj) return 1;
+      if (!b.dateObj) return -1;
+      return a.dateObj - b.dateObj; // du plus ancien au plus récent
+    });
+
     return arr;
   }, [data?.focus]);
 
-  // Auto-slide toutes les 5 secondes
+  // 🔹 Auto-slide toutes les 5 secondes
   useEffect(() => {
     if (!slides.length) return () => {};
 
@@ -30,7 +36,7 @@ const Slider = () => {
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  // Ajuste l'index si la longueur change
+  // 🔹 Ajuste l'index si la longueur change
   useEffect(() => {
     if (index > slides.length - 1) {
       setIndex(Math.max(0, slides.length - 1));
@@ -51,7 +57,7 @@ const Slider = () => {
             <div className="SlideCard__description">
               <h3>{event.title}</h3>
               <p>{event.description}</p>
-              {event.date && <div>{getMonth(new Date(event.date))}</div>}
+              {event.dateObj && <div>{getMonth(event.dateObj)}</div>}
             </div>
           </div>
         </div>

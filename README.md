@@ -34,8 +34,6 @@ _ useMemo + spread ([...data.focus]) \* comparateur new Date(b) - new Date(a)
 
 3 : src>containers>Events :
 
-const typeList = new Set(data?.events.map((event) => event.type));
-<Select
-selection={Array.from(typeList)}
-onChange={(value) => (value ? changeType(value) : changeType(null))}
-/>
+ligne 23 > onChange(newValue); ajouter newValue
+
+pb pagination : à enlever

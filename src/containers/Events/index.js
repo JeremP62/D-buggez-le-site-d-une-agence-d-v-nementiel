@@ -4,86 +4,66 @@ import Select from "../../components/Select";
 import { useData } from "../../contexts/DataContext";
 import Modal from "../Modal";
 import ModalEvent from "../ModalEvent";
+import { parseDate, getMonth } from "../../helpers/Date";
 
 import "./style.css";
 
-const PER_PAGE = 9;
-
 const EventList = () => {
   const { data, error } = useData();
-  const [type, setType] = useState();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [type, setType] = useState(null);
 
-  // Clone des events et échange 1ère <-> 2ème (si présentes)
   const events = useMemo(() => {
-    const arr = [...(data?.events ?? [])];
+    const arr = [...(data?.events ?? [])].map(ev => {
+      const dateObj = parseDate(ev.date);
+      if (!dateObj) return ev;
+
+      const day = dateObj.getDate();
+      const month = getMonth(dateObj);
+      const year = dateObj.getFullYear();
+
+      return {
+        ...ev,
+        date: dateObj,                     // pour EventCard
+        periode: `${day} ${month} ${year}` // pour ModalEvent
+      };
+    });
+
     if (arr.length >= 2) [arr[0], arr[1]] = [arr[1], arr[0]];
     return arr;
   }, [data?.events]);
 
-  // Liste des types pour le Select
-  const typeList = useMemo(() => Array.from(new Set((data?.events ?? []).map((ev) => ev.type))), [data?.events]);
-
-  // Liste filtrée selon le type choisi
-  const eventsByType = useMemo(
-    () => (type ? events.filter((e) => e.type === type) : events),
-    [events, type]
-  );
-
-  // Pagination
-  const totalItems = eventsByType.length;
-  const pageCount = Math.max(1, Math.ceil(totalItems / PER_PAGE));
-
-  const pagedEvents = useMemo(
-    () => eventsByType.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE),
-    [eventsByType, currentPage]
-  );
-
-  const changeType = (evtType) => {
-    setCurrentPage(1);
-    setType(evtType);
-  };
+  const typeList = useMemo(() => Array.from(new Set(events.map(ev => ev.type))), [events]);
+  const eventsByType = useMemo(() => (type ? events.filter(ev => ev.type === type) : events), [events, type]);
 
   return (
     <>
-      {error && <div>An error occured</div>}
+      {error && <div>An error occurred</div>}
 
       {data == null ? (
         "loading"
       ) : (
         <>
           <h3 className="SelectTitle">Catégories</h3>
-          <Select selection={typeList} onChange={(value) => changeType(value || null)} />
+          <Select
+            selection={typeList}
+            value={type}
+            onChange={(value) => setType(value || null)}
+          />
 
           <div id="events" className="ListContainer">
-            {pagedEvents.map((event) => (
-              <Modal key={event.id} Content={<ModalEvent event={event} />}>
+            {eventsByType.map((ev) => (
+              <Modal key={ev.id} Content={<ModalEvent event={ev} />}>
                 {({ setIsOpened }) => (
                   <EventCard
                     onClick={() => setIsOpened(true)}
-                    imageSrc={event.cover}
-                    title={event.title}
-                    date={event.date ? new Date(event.date) : null}
-                    label={event.type}
+                    imageSrc={ev.cover}
+                    title={ev.title}
+                    date={ev.date}   // objet Date normalisé
+                    label={ev.type}
+                    prestations={ev.prestations}
                   />
                 )}
               </Modal>
-            ))}
-          </div>
-
-          <div className="Pagination">
-            {Array.from({ length: pageCount }).map((_, i) => (
-              <a
-                key={`page-${i + 1}`}
-                href="#events"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setCurrentPage(i + 1);
-                }}
-                aria-current={currentPage === i + 1 ? "page" : undefined}
-              >
-                {i + 1}
-              </a>
             ))}
           </div>
         </>
@@ -93,3 +73,4 @@ const EventList = () => {
 };
 
 export default EventList;
+
