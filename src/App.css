@@ -2,6 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;700&family=Montserrat:wght@100;600;700&display=swap");
 body {
   font-family: "Space Grotesk", sans-serif;
+  overflow-x: hidden;
 }
 
 .App {

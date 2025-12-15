@@ -4,6 +4,7 @@ import { getMonth } from "../../helpers/Date";
 
 import "./style.scss";
 
+
 const EventCard = ({
   imageSrc,
   imageAlt,
@@ -28,8 +29,6 @@ const EventCard = ({
     </div>
   </div>
 );
-
-
 
 EventCard.propTypes = {
   imageSrc: PropTypes.string.isRequired,
