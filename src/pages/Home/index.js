@@ -14,6 +14,10 @@ import { useData } from "../../contexts/DataContext";
 
 const Page = () => {
   const {last} = useData()
+  const {data} = useData()
+
+ console.log("Dernière prestation :", data);
+
   return <>
     <header>
       <Menu />
@@ -121,7 +125,7 @@ const Page = () => {
            title={last?.title || "Titre non défini"}
            date={last?.date ? new Date(last.date) : new Date()}
           small
-          label="boom"
+          label="Dernière prestation"
         />
       </div>
       <div className="col contact">

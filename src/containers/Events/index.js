@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+// src/containers/Events/index.js
+import React, { useMemo, useState } from "react";
 import EventCard from "../../components/EventCard";
 import Select from "../../components/Select";
 import { useData } from "../../contexts/DataContext";
@@ -10,67 +11,86 @@ import "./style.css";
 
 const EventList = () => {
   const { data, error } = useData();
-  const [type, setType] = useState(null);
+  const [selectedType, setSelectedType] = useState(null);
 
-  const events = useMemo(() => {
-    const arr = [...(data?.events ?? [])].map(ev => {
+  // Supprime les doublons par image et regroupe types/titres
+  const uniqueEvents = useMemo(() => {
+    if (!data?.events) return [];
+
+    const map = new Map();
+
+    data.events.forEach(ev => {
+      const key = ev.cover; // clé unique uniquement sur l'image
       const dateObj = parseDate(ev.date);
-      if (!dateObj) return ev;
 
-      const day = dateObj.getDate();
-      const month = getMonth(dateObj);
-      const year = dateObj.getFullYear();
-
-      return {
-        ...ev,
-        date: dateObj,                     // pour EventCard
-        periode: `${day} ${month} ${year}` // pour ModalEvent
-      };
+      if (!map.has(key)) {
+        map.set(key, {
+          ...ev,
+          types: [ev.type],
+          titles: [ev.title],
+          date: dateObj || ev.date,
+          periode: dateObj
+            ? `${dateObj.getDate()} ${getMonth(dateObj)} ${dateObj.getFullYear()}`
+            : ev.date
+        });
+      } else {
+        const existing = map.get(key);
+        if (!existing.types.includes(ev.type)) existing.types.push(ev.type);
+        if (!existing.titles.includes(ev.title)) existing.titles.push(ev.title);
+      }
     });
 
-    if (arr.length >= 2) [arr[0], arr[1]] = [arr[1], arr[0]];
-    return arr;
+    return Array.from(map.values());
   }, [data?.events]);
 
-  const typeList = useMemo(() => Array.from(new Set(events.map(ev => ev.type))), [events]);
-  const eventsByType = useMemo(() => (type ? events.filter(ev => ev.type === type) : events), [events, type]);
+  // Liste unique de toutes les catégories
+  const typeList = useMemo(() =>
+    Array.from(new Set(uniqueEvents.flatMap(ev => ev.types)))
+  , [uniqueEvents]);
+
+  // Filtrage par type
+  const eventsByType = useMemo(() =>
+    selectedType
+      ? uniqueEvents.filter(ev => ev.types.includes(selectedType))
+      : uniqueEvents
+  , [uniqueEvents, selectedType]);
+
+  if (error) return <div>An error occurred</div>;
+  if (!data) return <div>Loading...</div>;
 
   return (
-    <>
-      {error && <div>An error occurred</div>}
+    <div>
+      {/* Filtre centré avec titre au-dessus */}
+      <div className="FilterWrapper">
+        <h3 className="SelectTitle">Catégories</h3>
+        <Select
+          selection={typeList}
+          value={selectedType}
+          onChange={value => setSelectedType(value || null)}
+        />
+      </div>
 
-      {data == null ? (
-        "loading"
-      ) : (
-        <>
-          <h3 className="SelectTitle">Catégories</h3>
-          <Select
-            selection={typeList}
-            value={type}
-            onChange={(value) => setType(value || null)}
-          />
-
-          <div id="events" className="ListContainer">
-            {eventsByType.map((ev) => (
-              <Modal key={ev.id} Content={<ModalEvent event={ev} />}>
-                {({ setIsOpened }) => (
-                  <EventCard
-                    onClick={() => setIsOpened(true)}
-                    imageSrc={ev.cover}
-                    title={ev.title}
-                    date={ev.date}   // objet Date normalisé
-                    label={ev.type}
-                    prestations={ev.prestations}
-                  />
-                )}
-              </Modal>
-            ))}
-          </div>
-        </>
-      )}
-    </>
+      {/* Grille des événements */}
+      <div id="events" className="ListContainer">
+        {eventsByType.map(ev => (
+          <Modal key={ev.cover} Content={<ModalEvent event={ev} />}>
+            {({ setIsOpened }) => (
+              <div style={{ width: "100%" }}>
+                <EventCard
+                  onClick={() => setIsOpened(true)}
+                  imageSrc={ev.cover}
+                  title={ev.titles.join(" / ")} // concatène tous les titres associés
+                  date={ev.date}
+                  label={ev.types.join(", ")}   // concatène tous les types associés
+                  prestations={ev.prestations}
+                />
+              </div>
+            )}
+          </Modal>
+        ))}
+      </div>
+    </div>
   );
 };
 
 export default EventList;
-
