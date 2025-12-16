@@ -39,7 +39,7 @@ const data = {
 
 describe("When Events is created", () => {
   it("a list of event card is displayed", async () => {
-    api.loadData = jest.fn().mockRejectedValue(new Error("Échec du chargement"));
+    api.loadData = jest.fn().mockReturnValue(data);
 
     render(
       <DataProvider>
@@ -48,26 +48,27 @@ describe("When Events is created", () => {
     );
     await screen.findByText("avril");
   });
-  describe("and an error occured", () => {
+  describe("and an error occurred", () => {
     it("an error message is displayed", async () => {
-      api.loadData = jest.fn().mockRejectedValue();
+      api.loadData = jest.fn().mockRejectedValue(new Error("Erreur Test"));
+      
       render(
         <DataProvider>
           <Events />
         </DataProvider>
       );
-      expect(await screen.findByText("An error occured")).toBeInTheDocument();
+      expect(await screen.findByText(/An error occurred/i)).toBeInTheDocument();
     });
   });
   describe("and we select a category", () => {
-    it.only("an filtered list is displayed", async () => {
+    it("an filtered list is displayed", async () => {
       api.loadData = jest.fn().mockReturnValue(data);
       render(
         <DataProvider>
           <Events />
         </DataProvider>
       );
-      await screen.findByText("Forum #productCON");
+      await screen.findByText(/Forum #productCON/i);
       fireEvent(
         await screen.findByTestId("collapse-button-testid"),
         new MouseEvent("click", {
@@ -83,7 +84,9 @@ describe("When Events is created", () => {
         })
       );
 
-      await screen.findByText("Conférence #productCON");
+      screen.debug();
+
+      await screen.findByText(/Conférence #productCON/i);
       expect(screen.queryByText("Forum #productCON")).not.toBeInTheDocument();
     });
   });
@@ -96,16 +99,14 @@ describe("When Events is created", () => {
           <Events />
         </DataProvider>
       );
+       
+      // j'attend l'événement qui s'affiche dans la liste
+      const eventCard = await screen.findByText(/Conférence #productCON/i);
 
-      fireEvent(
-        await screen.findByText("Conférence #productCON"),
-        new MouseEvent("click", {
-          cancelable: true,
-          bubbles: true,
-        })
-      );
+      //clique sur la carte de l'event
+      fireEvent.click(eventCard);
 
-      await screen.findByText("24-25-26 Février");
+      await screen.findByText(/29 avril 2022/i);
       await screen.findByText("1 site web dédié");
     });
   });
