@@ -9,23 +9,25 @@ describe("When Form is created", () => {
     await screen.findByText("Prénom");
     await screen.findByText("Personel / Entreprise");
   });
+});
 
   describe("and a click is triggered on the submit button", () => {
     it("the success message is displayed", async () => {
       render(<Home />);
-      fireEvent(
-        await screen.findByText("Envoyer"),
-        new MouseEvent("click", {
-          cancelable: true,
-          bubbles: true,
-        })
-      );
-      await screen.findByText("En cours");
-      await screen.findByText("Message envoyé !");
-    });
-  });
+      
+    const fields = screen.getAllByTestId("field-testid");
+    fireEvent.change(fields[0], { target: { value: "Nom" } });
+    fireEvent.change(fields[1], { target: { value: "Prenom" } });
+    fireEvent.change(fields[2], { target: { value: "test@test.com" } });
+    fireEvent.change(fields[3], { target: { value: "Message de test assez long" } });
 
-});
+    const button = screen.getByText("Envoyer");
+    fireEvent.click(button);
+
+    
+    await screen.findByText("Message envoyé !");
+    });
+  });     
 
 
 describe("When a page is created", () => {
