@@ -9,7 +9,7 @@ const mockContactApi = () =>
     setTimeout(resolve, 500);
   });
 
-// simple regex email (pas parfaite mais suffisante pour validation)
+// simple regex email expression réguliere
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Form = ({ onSuccess, onError }) => {
@@ -82,8 +82,7 @@ const Form = ({ onSuccess, onError }) => {
       setSending(true);
 
       try {
-        console.log("Envoi du formulaire :", form); // debug
-        await mockContactApi(); // remplace par fetch si nécessaire
+        await mockContactApi(); 
         setSending(false);
         setGlobalMessage({ type: "success", text: "Votre message a bien été envoyé ✔️" });
 
@@ -103,7 +102,6 @@ const Form = ({ onSuccess, onError }) => {
         // auto-hide message after 4s
         setTimeout(() => setGlobalMessage(null), 4000);
       } catch (err) {
-        console.error("Erreur d'envoi :", err);
         setSending(false);
         setGlobalMessage({ type: "error", text: "Une erreur est survenue. Réessayez plus tard." });
         if (typeof onError === "function") onError(err);
@@ -115,7 +113,7 @@ const Form = ({ onSuccess, onError }) => {
 
   // helpful effect: log when globalMessage changes for debug
   useEffect(() => {
-    if (globalMessage) console.info("Form message:", globalMessage);
+    if (globalMessage);
   }, [globalMessage]);
 
   return (

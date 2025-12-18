@@ -9,7 +9,7 @@ const Slider = () => {
   const [index, setIndex] = useState(0);
   const id = useId();
 
-  // 🔹 Tri des slides du plus ancien au plus récent
+  // Tri des slides du plus ancien au plus récent
   const slides = useMemo(() => {
     const arr = [...(data?.focus ?? [])].map((ev) => ({
       ...ev,
@@ -25,7 +25,7 @@ const Slider = () => {
     return arr;
   }, [data?.focus]);
 
-  // 🔹 Auto-slide toutes les 5 secondes
+  // Auto-slide toutes les 5 secondes
   useEffect(() => {
     if (!slides.length) return () => {};
 
@@ -36,7 +36,7 @@ const Slider = () => {
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  // 🔹 Ajuste l'index si la longueur change
+  // Ajuste l'index si la longueur change
   useEffect(() => {
     if (index > slides.length - 1) {
       setIndex(Math.max(0, slides.length - 1));
