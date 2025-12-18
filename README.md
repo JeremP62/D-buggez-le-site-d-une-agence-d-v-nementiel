@@ -1,39 +1,52 @@
-# 724 Events
+# 724events – Site vitrine (Debug, Optimisation & Tests)
 
-## Description
+## Contexte du projet
 
-L'application est le site d'une agence evenementielle.
+724events est une agence événementielle souhaitant publier une nouvelle version de son site vitrine **one-page** développé en React.
 
-## Pre-requis
+Le design et une première intégration avaient déjà été réalisés par un développeur freelance.  
+Cependant, plusieurs _bugs fonctionnels_, _problèmes de performance_ et _tests unitaires en échec_ empêchaient la mise en production du site.
 
-- NodeJS >= v16.14.1
+J’ai été missionné en tant que **développeur front-end freelance** pour :
 
-## Installation
+- reprendre le projet,
+- corriger les dysfonctionnements,
+- améliorer la stabilité et les performances,
+- sécuriser le site grâce aux tests unitaires,
+- finaliser le cahier de recette.
 
-- `yarn install`
+---
 
-## Lancement de l'application
+## Objectifs de la mission
 
-- `yarn start`
+- Corriger l’ensemble des bugs bloquants
+- Améliorer l’expérience utilisateur
+- Optimiser les performances des composants React
+- Valider le bon fonctionnement via des tests unitaires
+- Livrer un site **stable, fluide et prêt pour la production**
 
-## Tests
+---
 
-- `yarn test`
+## Stack technique
 
-  1.Le Slider : page blanche
-  2.L'ordre des événements du slider plus ancien
-  3.selecteur de catégorie
-  4.liste des évenements affiche pas le bon mois
-  5.formulaire de contact avec confirmation
-  6.Footer : aucune images affiché
+- **React**
+- **JavaScript (ES6+)**
+- **React Testing Library**
+- **Jest**
+- **Yarn**
+- **Node.js ≥ 16.14.2**
 
-1 : src>containers>Slider : _ useId() : name unique
-_ key = ev.id ?? radioIdx
-_ checked={index === radioIdx} + onChange={() => setIndex(radioIdx)}
-_ useMemo + spread ([...data.focus]) \* comparateur new Date(b) - new Date(a)
+---
 
-3 : src>containers>Events :
+## Installation & lancement du projet
 
-ligne 23 > onChange(newValue); ajouter newValue
+### Prérequis
 
-pb pagination : à enlever
+- Node.js
+- Yarn installé globalement
+
+### Installation
+
+```bash
+yarn install
+```
