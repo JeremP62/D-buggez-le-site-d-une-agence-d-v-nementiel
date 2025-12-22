@@ -58,9 +58,7 @@ const Form = ({ onSuccess, onError }) => {
     if (!form.message || form.message.trim().length < 5) {
       next.message = "Le message doit contenir au moins 5 caractères.";
     }
-    // kind is optional here; si requis, décommenter:
-    // if (!form.kind) next.kind = "Veuillez choisir Personel ou Entreprise.";
-
+    
     setErrors(next);
     return Object.keys(next).length === 0;
   }, [form]);

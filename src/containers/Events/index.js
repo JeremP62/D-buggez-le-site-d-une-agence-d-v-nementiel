@@ -49,11 +49,18 @@ const EventList = () => {
   , [uniqueEvents]);
 
   // Filtrage par type
-  const eventsByType = useMemo(() =>
-    selectedType
-      ? uniqueEvents.filter(ev => ev.types.includes(selectedType))
-      : uniqueEvents
-  , [uniqueEvents, selectedType]);
+  const eventsByType = useMemo(() => {
+    // Si rien n'est sélectionné (ou "Toutes"), on retourne tout
+    if (!selectedType) return uniqueEvents;
+
+    return uniqueEvents.filter((ev) =>
+      // On utilise .some() car ev.types est un tableau
+      // On force les deux côtés en minuscule pour ignorer la casse
+      ev.types.some(
+        (type) => type.toLowerCase() === selectedType.toLowerCase()
+      )
+    );
+  }, [uniqueEvents, selectedType]);
 
   if (error) return <div>An error occurred</div>;
   if (!data) return <div>Loading...</div>;
